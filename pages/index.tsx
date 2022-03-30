@@ -2,7 +2,7 @@ import * as React from "react";
 import { Box, Card, Container, FormControl, TextField } from "@mui/material";
 import type { NextPage } from "next";
 import { Message } from "../components/Message";
-
+import io, { Socket } from "socket.io-client";
 interface IMessage {
   text: string;
   id: string;
@@ -12,6 +12,7 @@ const Home: NextPage = () => {
   const [inputValue, setInputValue] = React.useState("");
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const messageBoxRef = React.useRef<HTMLDivElement>(null);
+  const [socket, setSocket] = React.useState<Socket | null>(null);
 
   const scrollToBottom = () => {
     messageBoxRef.current?.scrollIntoView({
@@ -19,6 +20,12 @@ const Home: NextPage = () => {
       block: "nearest",
     });
   };
+
+  React.useEffect(() => {
+    const newSocket = io(`http://${window.location.hostname}:3000`);
+    setSocket(newSocket);
+    () => socket?.close();
+  }, []);
 
   React.useEffect(() => {
     scrollToBottom();
@@ -53,6 +60,7 @@ const Home: NextPage = () => {
     const inputValue = event.target.value.trimStart();
     setInputValue(inputValue);
   };
+
   return (
     <>
       <Container maxWidth="md" sx={{ paddingTop: "2rem" }}>
