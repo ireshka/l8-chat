@@ -58,6 +58,7 @@ const Home: NextPage = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    handleIncomingMessage(inputValue);
     socket?.emit(EventsKeys.NEW_CLIENT_MESSAGE, inputValue);
     setInputValue("");
   };

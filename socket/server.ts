@@ -10,7 +10,7 @@ export function setupHandlers(io: Server) {
       console.log("server got new message");
       console.log(message);
       // socket.emit("serverMessage", message);
-      io.emit(EventsKeys.SERVER_MESSAGE, message);
+      socket.broadcast.emit(EventsKeys.SERVER_MESSAGE, message);
     });
   });
 }
