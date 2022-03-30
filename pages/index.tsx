@@ -55,11 +55,7 @@ const Home: NextPage = () => {
   };
   return (
     <>
-      <Container
-        maxWidth="md"
-        sx={{ paddingTop: "2rem" }}
-        onClick={handleBoxClick}
-      >
+      <Container maxWidth="md" sx={{ paddingTop: "2rem" }}>
         <Card
           variant="outlined"
           sx={{
@@ -69,6 +65,7 @@ const Home: NextPage = () => {
             overflow: "auto",
             borderColor: "blue",
           }}
+          onClick={handleBoxClick}
         >
           {messages.map((message) => (
             <Message text={message.text} key={message.id} />
