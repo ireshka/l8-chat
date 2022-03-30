@@ -5,10 +5,11 @@ export function setupHandlers(io: Server) {
     console.log("WOOHOO");
     socket.emit("connected", "connected");
 
-    socket.on("newMessage", (message: string) => {
+    socket.on("newClientMessage", (message: string) => {
       console.log("server got new message");
       console.log(message);
-      socket.emit("serverMessage", message);
+      // socket.emit("serverMessage", message);
+      io.emit("serverMessage", message);
     });
   });
 }

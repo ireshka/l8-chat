@@ -35,17 +35,17 @@ const Home: NextPage = () => {
     socket?.on("connected", (data) => handleIncomingMessage(data));
   });
 
-  const handleIncomingMessage = React.useCallback((data: string) => {
+  const handleIncomingMessage = (data: string) => {
     console.log(data);
     addMessageToList(data);
-  }, []);
+  };
 
   React.useEffect(() => {
     socket?.on("serverMessage", (data) => {
       console.log("ok, i got serverMessage");
       handleIncomingMessage(data);
     });
-  }, [socket, handleIncomingMessage]);
+  }, [socket]);
 
   React.useEffect(() => {
     setTimeout(() => addMessageToList("3sek"), 3000);
@@ -64,9 +64,7 @@ const Home: NextPage = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    socket?.emit("newMessage", inputValue);
-
-    // addMessageToList(inputValue);
+    socket?.emit("newClientMessage", inputValue);
     setInputValue("");
   };
 
