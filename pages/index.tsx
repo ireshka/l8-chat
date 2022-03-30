@@ -3,6 +3,7 @@ import { Box, Card, Container, FormControl, TextField } from "@mui/material";
 import type { NextPage } from "next";
 import { Message } from "../components/Message";
 import io, { Socket } from "socket.io-client";
+import { EventsKeys } from "../types";
 interface IMessage {
   text: string;
   id: string;
@@ -13,7 +14,6 @@ const Home: NextPage = () => {
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const messageBoxRef = React.useRef<HTMLDivElement>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
-  const [isConnected, setConnected] = React.useState(false);
 
   const scrollToBottom = () => {
     messageBoxRef.current?.scrollIntoView({
@@ -24,6 +24,11 @@ const Home: NextPage = () => {
 
   React.useEffect(() => {
     const newSocket = io(`http://${window.location.hostname}:3000`);
+    newSocket.on(EventsKeys.CONNECTED, (data) => handleIncomingMessage(data));
+    newSocket.on(EventsKeys.SERVER_MESSAGE, (data) => {
+      console.log("ok, i got serverMessage");
+      handleIncomingMessage(data);
+    });
     setSocket(newSocket);
   }, []);
 
@@ -31,21 +36,10 @@ const Home: NextPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  React.useEffect(() => {
-    socket?.on("connected", (data) => handleIncomingMessage(data));
-  });
-
   const handleIncomingMessage = (data: string) => {
     console.log(data);
     addMessageToList(data);
   };
-
-  React.useEffect(() => {
-    socket?.on("serverMessage", (data) => {
-      console.log("ok, i got serverMessage");
-      handleIncomingMessage(data);
-    });
-  }, [socket]);
 
   React.useEffect(() => {
     setTimeout(() => addMessageToList("3sek"), 3000);
@@ -64,7 +58,7 @@ const Home: NextPage = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    socket?.emit("newClientMessage", inputValue);
+    socket?.emit(EventsKeys.NEW_CLIENT_MESSAGE, inputValue);
     setInputValue("");
   };
 
@@ -106,6 +100,7 @@ const Home: NextPage = () => {
             placeholder="Your message"
             onChange={handleInputChange}
             value={inputValue}
+            autoComplete="off"
           />
         </FormControl>
       </Container>
