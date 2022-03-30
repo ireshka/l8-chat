@@ -13,6 +13,7 @@ const Home: NextPage = () => {
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const messageBoxRef = React.useRef<HTMLDivElement>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
+  const [isConnected, setConnected] = React.useState(false);
 
   const scrollToBottom = () => {
     messageBoxRef.current?.scrollIntoView({
@@ -24,12 +25,15 @@ const Home: NextPage = () => {
   React.useEffect(() => {
     const newSocket = io(`http://${window.location.hostname}:3000`);
     setSocket(newSocket);
-    () => socket?.close();
   }, []);
 
   React.useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  React.useEffect(() => {
+    socket?.on("connected", handleIncomingMessage);
+  });
 
   React.useEffect(() => {
     setTimeout(() => addMessageToList("3sek"), 3000);
@@ -44,6 +48,11 @@ const Home: NextPage = () => {
       const newMessages = [...prevMessages, messageObject];
       return newMessages;
     });
+  };
+
+  const handleIncomingMessage = (data: string) => {
+    console.log(data);
+    addMessageToList(data);
   };
 
   const handleSubmit = (event: React.FormEvent) => {
