@@ -1,9 +1,17 @@
 import * as React from "react";
-import { Box, Card, Container, FormControl, TextField } from "@mui/material";
+import {
+  Box,
+  Card,
+  Container,
+  FormControl,
+  Stack,
+  TextField,
+} from "@mui/material";
 import type { NextPage } from "next";
 import { Message } from "../components/Message";
 import io, { Socket } from "socket.io-client";
 import { EventsKeys } from "../types";
+import { RoomListElement } from "../components/RoomListElement";
 interface IMessage {
   text: string;
   id: string;
@@ -14,6 +22,12 @@ const Home: NextPage = () => {
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const messageBoxRef = React.useRef<HTMLDivElement>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
+  const [rooms, setRooms] = React.useState<string[]>([
+    "General",
+    "Test",
+    "Night talk",
+  ]);
+  const [activeRoom, setActiveRoom] = React.useState("General");
 
   const scrollToBottom = () => {
     messageBoxRef.current?.scrollIntoView({
@@ -81,36 +95,64 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ paddingTop: "2rem" }}>
-        <Card
-          variant="outlined"
-          sx={{
-            minHeight: "200px",
-            height: "80vh",
-            padding: "10px",
-            overflow: "auto",
-            borderColor: "blue",
-          }}
-          // onClick={handleBoxClick}
+      <Container maxWidth="lg" sx={{ paddingTop: "2rem" }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="stretch"
+          spacing={0.5}
         >
-          {messages.map((message) => (
-            <Message text={message.text} key={message.id} />
-          ))}
-          <Box ref={messageBoxRef} />
-        </Card>
-        <FormControl
-          onSubmit={handleSubmit}
-          component="form"
-          sx={{ marginTop: "10px", width: "100%" }}
-        >
-          <TextField
-            fullWidth
-            placeholder="Your message"
-            onChange={handleInputChange}
-            value={inputValue}
-            autoComplete="off"
-          />
-        </FormControl>
+          <Card
+            sx={{
+              marginRight: "10px",
+              borderColor: "blue",
+              minWidth: "15%",
+              padding: "10px",
+            }}
+            variant="outlined"
+          >
+            <Stack>
+              {rooms.map((roomEl) => (
+                <RoomListElement
+                  roomName={roomEl}
+                  isActiveRoom={roomEl === activeRoom}
+                  key={roomEl}
+                />
+              ))}
+            </Stack>
+          </Card>
+          <Box flexGrow="1">
+            <Card
+              variant="outlined"
+              sx={{
+                minHeight: "200px",
+                height: "80vh",
+                padding: "10px",
+                overflow: "auto",
+                borderColor: "blue",
+              }}
+              // onClick={handleBoxClick}
+            >
+              {messages.map((message) => (
+                <Message text={message.text} key={message.id} />
+              ))}
+              <Box ref={messageBoxRef} />
+            </Card>
+            <FormControl
+              onSubmit={handleSubmit}
+              component="form"
+              sx={{ marginTop: "10px", width: "100%" }}
+            >
+              <TextField
+                fullWidth
+                placeholder="Your message"
+                onChange={handleInputChange}
+                value={inputValue}
+                autoComplete="off"
+              />
+            </FormControl>
+          </Box>
+        </Stack>
       </Container>
     </>
   );
