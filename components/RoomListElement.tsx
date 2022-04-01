@@ -1,9 +1,10 @@
 import { Stack, Box } from "@mui/material";
+import { RoomKeys } from '../types';
 
 type RoomListElementProps = {
-  roomName: string;
+  roomName: RoomKeys;
   isActiveRoom: boolean;
-  handleRoomClick: (roomName: string) => void;
+  handleRoomClick: (roomName: RoomKeys) => void;
 };
 
 export const RoomListElement = ({

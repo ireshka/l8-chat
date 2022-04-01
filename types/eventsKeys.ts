@@ -3,4 +3,5 @@ export enum EventsKeys {
   CONNECTED = "connected",
   SERVER_MESSAGE = "serverMessage",
   NEW_CLIENT_MESSAGE = "newClient",
+  JOIN = "join",
 }

@@ -11,7 +11,7 @@ import {
 import type { NextPage } from "next";
 import { Message } from "../components/Message";
 import io, { Socket } from "socket.io-client";
-import { EventsKeys } from "../types";
+import { EventsKeys, RoomKeys } from "../types";
 import { RoomListElement } from "../components/RoomListElement";
 interface IMessage {
   text: string;
@@ -23,12 +23,12 @@ const Home: NextPage = () => {
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const messageBoxRef = React.useRef<HTMLDivElement>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
-  const [rooms, setRooms] = React.useState<string[]>([
-    "General",
-    "Test",
-    "Night talk",
+  const [rooms, setRooms] = React.useState<RoomKeys[]>([
+    RoomKeys.GENERAL,
+    RoomKeys.NIGHTALK,
+    RoomKeys.TEST,
   ]);
-  const [activeRoom, setActiveRoom] = React.useState("General");
+  const [activeRoom, setActiveRoom] = React.useState(RoomKeys.GENERAL);
 
   const scrollToBottom = () => {
     messageBoxRef.current?.scrollIntoView({
@@ -44,6 +44,7 @@ const Home: NextPage = () => {
       console.log("ok, i got serverMessage");
       handleIncomingMessage(data);
     });
+    newSocket?.emit(EventsKeys.JOIN, activeRoom);
     setSocket(newSocket);
     return () => {
       newSocket.removeAllListeners();
@@ -94,7 +95,7 @@ const Home: NextPage = () => {
     setInputValue(inputValue);
   };
 
-  const handleRoomClick = (roomName: string) => {
+  const handleRoomClick = (roomName: RoomKeys) => {
     console.log("Room change");
     setActiveRoom(roomName);
   };
