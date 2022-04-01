@@ -30,6 +30,10 @@ const Home: NextPage = () => {
       handleIncomingMessage(data);
     });
     setSocket(newSocket);
+    return () => {
+      newSocket.removeAllListeners();
+      newSocket.close();
+    };
   }, []);
 
   React.useEffect(() => {
@@ -42,7 +46,10 @@ const Home: NextPage = () => {
   };
 
   React.useEffect(() => {
-    setTimeout(() => addMessageToList("3sek"), 3000);
+    const timeoutId = setTimeout(() => addMessageToList("3sek"), 3000);
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const addMessageToList = (text: string) => {
@@ -63,9 +70,9 @@ const Home: NextPage = () => {
     setInputValue("");
   };
 
-  const handleBoxClick = () => {
-    addMessageToList("innyEvent");
-  };
+  // const handleBoxClick = () => {
+  //   addMessageToList("innyEvent");
+  // };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value.trimStart();
@@ -84,7 +91,7 @@ const Home: NextPage = () => {
             overflow: "auto",
             borderColor: "blue",
           }}
-          onClick={handleBoxClick}
+          // onClick={handleBoxClick}
         >
           {messages.map((message) => (
             <Message text={message.text} key={message.id} />
