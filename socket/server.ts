@@ -9,7 +9,6 @@ export function setupHandlers(io: Server) {
     socket.on(EventsKeys.NEW_CLIENT_MESSAGE, (message: string) => {
       console.log("server got new message");
       console.log(message);
-      // socket.emit("serverMessage", message);
       socket.broadcast.emit(EventsKeys.SERVER_MESSAGE, message);
     });
   });
