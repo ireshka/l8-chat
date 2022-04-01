@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect } from "react";
 import {
   Box,
   Card,
@@ -13,6 +14,7 @@ import { Message } from "../components/Message";
 import io, { Socket } from "socket.io-client";
 import { EventsKeys, RoomKeys } from "../types";
 import { RoomListElement } from "../components/RoomListElement";
+
 interface IMessage {
   text: string;
   id: string;
@@ -23,11 +25,7 @@ const Home: NextPage = () => {
   const [messages, setMessages] = React.useState<IMessage[]>([]);
   const messageBoxRef = React.useRef<HTMLDivElement>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
-  const [rooms, setRooms] = React.useState<RoomKeys[]>([
-    RoomKeys.GENERAL,
-    RoomKeys.NIGHTALK,
-    RoomKeys.TEST,
-  ]);
+  const rooms = [RoomKeys.GENERAL, RoomKeys.NIGHTALK, RoomKeys.TEST];
   const [activeRoom, setActiveRoom] = React.useState(RoomKeys.GENERAL);
 
   const scrollToBottom = () => {
@@ -37,15 +35,24 @@ const Home: NextPage = () => {
     });
   };
 
-  React.useEffect(() => {
-    const newSocket = io(`http://${window.location.hostname}:3000`);
+  useEffect(() => {
+    rooms.forEach((room) => {
+      room === activeRoom
+        ? socket?.emit(EventsKeys.JOIN, room)
+        : socket?.emit(EventsKeys.LEAVE, room);
+    });
+  }, [activeRoom, socket]);
+
+  useEffect(() => {
+    setMessages([]);
+  }, [activeRoom]);
+
+  useEffect(() => {
+    const newSocket = io();
     newSocket.on(EventsKeys.CONNECTED, (data) => handleIncomingMessage(data));
     newSocket.on(EventsKeys.SERVER_MESSAGE, (data) => {
-      console.log("ok, i got serverMessage");
       handleIncomingMessage(data);
     });
-    newSocket.on(EventsKeys.JOINED, handleChangeRoom);
-    newSocket?.emit(EventsKeys.JOIN, activeRoom);
     setSocket(newSocket);
     return () => {
       newSocket.removeAllListeners();
@@ -53,27 +60,13 @@ const Home: NextPage = () => {
     };
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const handleIncomingMessage = (data: string) => {
-    console.log(data);
     addMessageToList(data);
   };
-
-  const handleChangeRoom = (roomName: RoomKeys) => {
-    console.log(`I want to new active room: ${roomName}`);
-    console.log(`Actual active room: ${activeRoom}`);
-    setActiveRoom(() => roomName);
-  }
-
-  React.useEffect(() => {
-    const timeoutId = setTimeout(() => addMessageToList("3sek"), 3000);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, []);
 
   const addMessageToList = (text: string) => {
     setMessages((prevMessages) => {
@@ -81,8 +74,7 @@ const Home: NextPage = () => {
         text,
         id: Math.random().toString(),
       };
-      const newMessages = [...prevMessages, messageObject];
-      return newMessages;
+      return [...prevMessages, messageObject];
     });
   };
 
@@ -93,19 +85,13 @@ const Home: NextPage = () => {
     setInputValue("");
   };
 
-  // const handleBoxClick = () => {
-  //   addMessageToList("innyEvent");
-  // };
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value.trimStart();
     setInputValue(inputValue);
   };
 
   const handleRoomClick = (roomName: RoomKeys) => {
-    console.log(`Actual room name: ${activeRoom}`);
-    console.log("Room change");
-    socket?.emit(EventsKeys.JOIN, roomName);
+    setActiveRoom(roomName);
   };
 
   return (
@@ -150,7 +136,6 @@ const Home: NextPage = () => {
                 overflow: "auto",
                 borderColor: "blue",
               }}
-              // onClick={handleBoxClick}
             >
               {messages.map((message) => (
                 <Message text={message.text} key={message.id} />
