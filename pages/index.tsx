@@ -6,6 +6,7 @@ import {
   FormControl,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import type { NextPage } from "next";
 import { Message } from "../components/Message";
@@ -93,6 +94,11 @@ const Home: NextPage = () => {
     setInputValue(inputValue);
   };
 
+  const handleRoomClick = (roomName: string) => {
+    console.log("Room change");
+    setActiveRoom(roomName);
+  };
+
   return (
     <>
       <Container maxWidth="lg" sx={{ paddingTop: "2rem" }}>
@@ -111,12 +117,16 @@ const Home: NextPage = () => {
             }}
             variant="outlined"
           >
+            <Typography variant="h5" component="h2">
+              Rooms
+            </Typography>
             <Stack>
               {rooms.map((roomEl) => (
                 <RoomListElement
                   roomName={roomEl}
                   isActiveRoom={roomEl === activeRoom}
                   key={roomEl}
+                  handleRoomClick={handleRoomClick}
                 />
               ))}
             </Stack>
