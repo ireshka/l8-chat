@@ -12,6 +12,7 @@ export const RoomListElement = ({
   isActiveRoom,
   handleRoomClick,
 }: RoomListElementProps) => {
+  console.log(roomName);
   return (
     <Stack
       onClick={() => handleRoomClick(roomName)}

@@ -44,6 +44,7 @@ const Home: NextPage = () => {
       console.log("ok, i got serverMessage");
       handleIncomingMessage(data);
     });
+    newSocket.on(EventsKeys.JOINED, handleChangeRoom);
     newSocket?.emit(EventsKeys.JOIN, activeRoom);
     setSocket(newSocket);
     return () => {
@@ -60,6 +61,12 @@ const Home: NextPage = () => {
     console.log(data);
     addMessageToList(data);
   };
+
+  const handleChangeRoom = (roomName: RoomKeys) => {
+    console.log(`I want to new active room: ${roomName}`);
+    console.log(`Actual active room: ${activeRoom}`);
+    setActiveRoom(() => roomName);
+  }
 
   React.useEffect(() => {
     const timeoutId = setTimeout(() => addMessageToList("3sek"), 3000);
@@ -96,8 +103,9 @@ const Home: NextPage = () => {
   };
 
   const handleRoomClick = (roomName: RoomKeys) => {
+    console.log(`Actual room name: ${activeRoom}`);
     console.log("Room change");
-    setActiveRoom(roomName);
+    socket?.emit(EventsKeys.JOIN, roomName);
   };
 
   return (
