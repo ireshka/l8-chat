@@ -1,5 +1,5 @@
 import { Stack, Box } from "@mui/material";
-import { RoomKeys } from '../types';
+import { RoomKeys } from "../types";
 
 type RoomListElementProps = {
   roomName: RoomKeys;
@@ -12,7 +12,6 @@ export const RoomListElement = ({
   isActiveRoom,
   handleRoomClick,
 }: RoomListElementProps) => {
-  console.log(roomName);
   return (
     <Stack
       onClick={() => handleRoomClick(roomName)}
